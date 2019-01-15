@@ -1,0 +1,42 @@
+{
+  "name": "claudia-api-jwt-authenticator",
+  "version": "0.0.0",
+  "description": "Easily verify JWTs with Claudia",
+  "main": "index.js",
+  "scripts": {
+    "lint": "tslint *.ts test.js --format stylish",
+    "lint:fix": "npm run lint -- --fix",
+    "posttest": "nyc check-coverage --lines 100 && npm run lint && stryker run",
+    "pretest": "npm run lint:fix ; tsc",
+    "test": "nyc ava"
+  },
+  "keywords": [
+    "auth",
+    "authentication",
+    "claudia",
+    "jsonwebtoken",
+    "jwt",
+    "plugin",
+    "verify"
+  ],
+  "author": "Aaron J. Lang <aaronjameslang@googlemail.com> (ajla.ng)",
+  "license": "MIT",
+  "dependencies": {
+    "@types/jsonwebtoken": "^8.3.0",
+    "jsonwebtoken": "^8.4.0",
+    "tslint-config-standard": "^8.0.1"
+  },
+  "devDependencies": {
+    "ava": "^1.1.0",
+    "claudia-api-builder": "^4.1.0",
+    "nyc": "^13.1.0",
+    "stryker": "^0.34.0",
+    "stryker-api": "^0.23.0",
+    "stryker-javascript-mutator": "^0.13.0",
+    "tslint": "^5.12.1",
+    "typescript": "^3.2.2"
+  },
+  "peerDependencies": {
+    "claudia-api-builder": "^4.1.0"
+  }
+}

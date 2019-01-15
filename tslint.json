@@ -1,0 +1,6 @@
+{
+    "defaultSeverity": "error",
+    "exclude": ["index.js"],
+    "extends": ["tslint:latest","tslint-config-standard"],
+    "jsRules": true
+}
