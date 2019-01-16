@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "Easily verify JWTs with Claudia",
   "main": "index.js",
-  "files": ["index.js"],
+  "files": [
+    "index.js"
+  ],
   "scripts": {
     "lint": "tslint *.ts test.js --format stylish",
     "lint:fix": "npm run lint -- --fix",
@@ -23,6 +25,7 @@
   ],
   "author": "Aaron J. Lang <aaronjameslang@googlemail.com> (ajla.ng)",
   "license": "MIT",
+  "repository": "aaronjameslang/claudia-api-jwt-authenticator",
   "dependencies": {
     "@types/jsonwebtoken": "^8.3.0",
     "jsonwebtoken": "^8.4.0",

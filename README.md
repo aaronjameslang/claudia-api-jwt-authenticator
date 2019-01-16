@@ -1,6 +1,6 @@
 # 🎟️ claudia-api-jwt-authenticator [![Build Status](https://travis-ci.org/aaronjameslang/claudia-api-jwt-authenticator.svg?branch=master)](https://travis-ci.org/aaronjameslang/claudia-api-jwt-authenticator)
 
-Easily verify [JWTs](https://jwt.io/) with [Claudia](https://github.com/claudiajs/claudia-api-builder)
+Easily verify and read [JWTs](https://jwt.io/) with [Claudia](https://github.com/claudiajs/claudia-api-builder)
 
 ## Installation
 
