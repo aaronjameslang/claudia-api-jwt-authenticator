@@ -70,7 +70,7 @@ exports.handler = api.proxyRouter
 
 See the [tests]() for more examples of what you can and shouldn't do
 
-## Contribution & Feedback
+## Contribution & Feedback [![Gitter](http://badges.gitter.im/claudia-api-jwt-authenticator.svg)](//gitter.im/claudia-api-jwt-authenticator) [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-brightgreen.svg)](https://conventionalcommits.org)
 
 Question? Bug? Feature request? Not sure? [Open an issue!](//github.com/aaronjameslang/claudia-api-jwt-authenticator/issues/new)
 
