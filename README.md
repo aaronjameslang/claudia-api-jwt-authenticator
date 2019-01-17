@@ -2,6 +2,7 @@
 
 [![Maintainability](http://api.codeclimate.com/v1/badges/be9063c2403a481deaf3/maintainability)](//codeclimate.com/github/aaronjameslang/claudia-api-jwt-authenticator/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/be9063c2403a481deaf3/test_coverage)](//aaronjameslang.com/claudia-api-jwt-authenticator/coverage)
+[![Mutation testing badge](https://badge.stryker-mutator.io/github.com/aaronjameslang/claudia-api-jwt-authenticator/master)](https://stryker-mutator.github.io)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/aaronjameslang/claudia-api-jwt-authenticator/badges/quality-score.png)](//scrutinizer-ci.com/g/aaronjameslang/claudia-api-jwt-authenticator)
 [![Known Vulnerabilities](http://snyk.io/test/github/aaronjameslang/claudia-api-jwt-authenticator/badge.svg)](//snyk.io/test/github/aaronjameslang/claudia-api-jwt-authenticator)
 [![Greenkeeper badge](https://badges.greenkeeper.io/aaronjameslang/claudia-api-jwt-authenticator.svg)](https://greenkeeper.io/)
