@@ -2,7 +2,7 @@
 
 Easily verify and read [JWTs](https://jwt.io/) with [Claudia](https://github.com/claudiajs/claudia-api-builder)
 
-## Installation
+## Installation [![npm version](https://badge.fury.io/js/claudia-api-jwt-authenticator.svg)](//npmjs.com/package/claudia-api-jwt-authenticator)
 
 ```shell
   npm i survey-monkey-streams
