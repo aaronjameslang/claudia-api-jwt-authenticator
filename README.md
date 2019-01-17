@@ -1,7 +1,7 @@
 # 🎟️ claudia-api-jwt-authenticator [![Build Status](https://travis-ci.org/aaronjameslang/claudia-api-jwt-authenticator.svg?branch=master)](https://travis-ci.org/aaronjameslang/claudia-api-jwt-authenticator)
 
-[![Maintainability](http://api.codeclimate.com/v1/badges/8a959084f74b5a86c453/maintainability)](//codeclimate.com/github/aaronjameslang/claudia-api-jwt-authenticator/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/8a959084f74b5a86c453/test_coverage)](//aaronjameslang.com/claudia-api-jwt-authenticator/coverage)
+[![Maintainability](http://api.codeclimate.com/v1/badges/be9063c2403a481deaf3/maintainability)](//codeclimate.com/github/aaronjameslang/claudia-api-jwt-authenticator/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/be9063c2403a481deaf3/test_coverage)](//aaronjameslang.com/claudia-api-jwt-authenticator/coverage)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/aaronjameslang/claudia-api-jwt-authenticator/badges/quality-score.png)](//scrutinizer-ci.com/g/aaronjameslang/claudia-api-jwt-authenticator)
 [![Known Vulnerabilities](http://snyk.io/test/github/aaronjameslang/claudia-api-jwt-authenticator/badge.svg)](//snyk.io/test/github/aaronjameslang/claudia-api-jwt-authenticator)
 [![Greenkeeper badge](https://badges.greenkeeper.io/aaronjameslang/claudia-api-jwt-authenticator.svg)](https://greenkeeper.io/)
