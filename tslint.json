@@ -2,5 +2,6 @@
     "defaultSeverity": "error",
     "exclude": ["index.js"],
     "extends": ["tslint:latest","tslint-config-standard"],
-    "jsRules": true
+    "jsRules": true,
+    "linterOptions": { "format": "stylish" }
 }

@@ -9,16 +9,16 @@ then
   ./cc-test-reporter before-build
 fi
 
-tslint *.ts test.js --format stylish --fix || true
+tslint *.ts test.js --fix || true
 tsc
 nyc --reporter=lcov ava
 nyc check-coverage --lines 100
-tslint *.ts test.js --format stylish
+stryker run
+tslint *.ts test.js
 
 if test ! -z ${CI:-}
 then
   # If build fails, this will never run, so can hard code 0
   ./cc-test-reporter after-build --exit-code 0
-  stryker run
   git diff --exit-code
 fi
