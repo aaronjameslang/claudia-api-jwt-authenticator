@@ -1,6 +1,8 @@
 #! /bin/sh
 set -eux
 
+# $1 --quick
+
 if test ! -z ${CI:-}
 then
   test ! -z $CC_TEST_REPORTER_ID
@@ -11,9 +13,22 @@ fi
 
 tslint -p . --fix || true
 tsc
+
+# Install locally, so tests run against pack'd code
+name=$(npm view . name)
+pkg_tgz="$(npm pack)"
+tar -zxf ${pkg_tgz}
+rm ${pkg_tgz}
+
 nyc --reporter=lcov ava
 nyc check-coverage --lines 100
-stryker run
+
+if ! test "${1:-}" = '--quick'
+then
+  stryker run
+fi
+
+rm -r package
 tslint -p .
 
 if test ! -z ${CI:-}

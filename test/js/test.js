@@ -1,7 +1,11 @@
 import ApiBuilder from "claudia-api-builder";
-import authenticator from "../../src/index";
+import authenticator from "../../package/";
 import test from "ava";
 import fs from "fs";
+
+test('authenticator is a function', t => {
+  t.is(typeof authenticator, 'function')
+})
 
 /**
  * ## Using a Public Key

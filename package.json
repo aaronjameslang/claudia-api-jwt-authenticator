@@ -2,13 +2,13 @@
   "name": "claudia-api-jwt-authenticator",
   "version": "0.1.0",
   "description": "Easily verify JWTs with Claudia",
-  "main": "index.js",
+  "main": "src/index.js",
   "files": [
-    "index.js"
+    "src/*.js"
   ],
   "scripts": {
     "test": "./test.sh",
-    "test:quick": "tsc && ava"
+    "test:quick": "./test.sh --quick"
   },
   "keywords": [
     "auth",
