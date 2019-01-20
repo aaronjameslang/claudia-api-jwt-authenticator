@@ -28,12 +28,14 @@ then
   : || stryker run
 fi
 
-rm -r package
 tslint -p .
 
 if test ! -z ${CI:-}
 then
   # If build fails, this will never run, so can hard code 0
   ./cc-test-reporter after-build --exit-code 0
+  rm -r package
   git diff --exit-code
+else
+  rm -r package
 fi
