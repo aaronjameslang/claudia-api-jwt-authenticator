@@ -1,5 +1,5 @@
 import ApiBuilder from "claudia-api-builder";
-import authenticator from "./index";
+import authenticator from "../../src/index";
 import test from "ava";
 import fs from "fs";
 
@@ -64,7 +64,7 @@ test.cb("Authenticate with public key", t => {
 const TOKEN_HS512 = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.Hk1Qgr18H-VwmDnMcljqEFy8_F1zeIVS-FY-3Xl2pKsMEeFii5-WEVDyBNRPredB9JjoNAkR23iOkTDN4Mu-Xg";
 
 const getSecretKey = (header, callback) => {
-  const filename = `./test.secret.${header.alg.toLowerCase()}.b64.txt`;
+  const filename = `test/test.secret.${header.alg.toLowerCase()}.b64.txt`;
   fs.readFile(filename, (err, b64) => {
     if (err) {
       return callback(err);

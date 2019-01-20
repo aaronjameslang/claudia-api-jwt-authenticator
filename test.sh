@@ -9,12 +9,12 @@ then
   ./cc-test-reporter before-build
 fi
 
-tslint *.ts test.js --fix || true
+tslint -p . --fix || true
 tsc
 nyc --reporter=lcov ava
 nyc check-coverage --lines 100
 stryker run
-tslint *.ts test.js
+tslint -p .
 
 if test ! -z ${CI:-}
 then
