@@ -1,6 +1,5 @@
 {
     "defaultSeverity": "error",
-    "exclude": ["package"],
     "extends": ["tslint:latest","tslint-config-standard"],
     "linterOptions": { "format": "stylish" },
     "rules": { "interface-name": false }

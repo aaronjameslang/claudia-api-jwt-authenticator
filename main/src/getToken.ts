@@ -1,14 +1,10 @@
+// tslint:disable-next-line: no-implicit-dependencies
+import { APIGatewayProxyEvent } from 'aws-lambda' // @types
 import UnauthorisedResponse from './UnauthorisedResponse'
 
 type Token = string
-interface Event {
-  headers?: {
-    Authorization?: string,
-    authorization?: string
-  }
-}
 
-const getToken = (event: Event): Token | UnauthorisedResponse => {
+const getToken = (event: APIGatewayProxyEvent): Token | UnauthorisedResponse => {
   const { headers } = event
   if (!headers) {
     return new UnauthorisedResponse('no headers')

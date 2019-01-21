@@ -9,26 +9,32 @@ then
   curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   chmod +x ./cc-test-reporter
   ./cc-test-reporter before-build
+else
+  tslint -p main --fix || true
+  tslint -p test --fix || true
 fi
 
-tslint -p . --fix || true
-tsc
-
-# Install locally, so tests run against pack'd code
-name=$(npm view . name)
+# ## Build
+tsc -p main
+# ### Install locally, so tests run against pack'd code
 pkg_tgz="$(npm pack)"
+rm -rf package
 tar -zxf ${pkg_tgz}
 rm ${pkg_tgz}
+# ### Build tests against package
+tsc -p test
 
-nyc --reporter=lcov ava
-nyc check-coverage --lines 100
+
+# ## Test
+nyc ava
 
 if ! test "${1:-}" = '--quick'
 then
   : || stryker run
 fi
 
-tslint -p .
+tslint -p main
+tslint -p test
 
 if test ! -z ${CI:-}
 then
