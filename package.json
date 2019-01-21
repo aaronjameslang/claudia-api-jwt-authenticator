@@ -1,6 +1,6 @@
 {
   "name": "claudia-api-jwt-authenticator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Easily verify JWTs with Claudia",
   "main": "main/lib",
   "files": [
@@ -45,6 +45,10 @@
     "claudia-api-builder": "^4.1.0"
   },
   "ava": {
-    "files": [ "test/lib","test/js","!test/tslint.js" ]
+    "files": [
+      "test/lib",
+      "test/js",
+      "!test/tslint.js"
+    ]
   }
 }
