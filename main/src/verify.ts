@@ -4,6 +4,7 @@ import {
     verify as jwtVerify,
     VerifyOptions
 } from 'jsonwebtoken'
+import depromisify, { SecretOrPublicKeyCb } from './depromisifi'
 
 export { VerifyOptions }
 
@@ -29,7 +30,8 @@ export const verify = (
     options: VerifyOptions,
     callback: VerifyCallback
 ) => {
-  jwtVerify(token, secretOrPublicKey, { ...options }, (error) => {
+  const secretOrPublicKeyCb: SecretOrPublicKeyCb = depromisify(secretOrPublicKey)
+  jwtVerify(token, secretOrPublicKeyCb, { ...options }, (error) => {
     if (error) {
       callback(error)
     }

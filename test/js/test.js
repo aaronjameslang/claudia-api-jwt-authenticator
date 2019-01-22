@@ -60,14 +60,15 @@ test.cb("Authenticate with public key", t => {
  * You must fetch the secret key securely at run time, either from a
  * file on you server or using a service like AWS Secrets Manager.
  *
- * Create a function that takes a callback like below, and passes the
- * secret key. Be sure to decode from base64 if needed.
+ * Create a function that fetches the secret key like below,
+ * and returns it via the callback or as a promise.
+ * Be sure to decode from base64 if needed.
  */
 
 // tslint:disable-next-line:max-line-length
 const TOKEN_HS512 = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.Hk1Qgr18H-VwmDnMcljqEFy8_F1zeIVS-FY-3Xl2pKsMEeFii5-WEVDyBNRPredB9JjoNAkR23iOkTDN4Mu-Xg";
 
-const getSecretKey = (header, callback) => {
+const getSecretKeyCb = (header, callback) => {
   const filename = `test/test.secret.${header.alg.toLowerCase()}.b64.txt`;
   fs.readFile(filename, (err, b64) => {
     if (err) {
@@ -79,7 +80,7 @@ const getSecretKey = (header, callback) => {
   });
 };
 
-test.cb("Authenticate with secret key", t => {
+test.cb("Authenticate with secret key, via callback", t => {
   t.plan(3);
   const event = {
       context: { method: "GET", path: "/greeting" },
@@ -95,7 +96,42 @@ test.cb("Authenticate with secret key", t => {
   // Begin by creating your Api Builder as normal
   const api = new ApiBuilder();
   // Next pass in the authenticator along with your key and any config
-  api.intercept(authenticator(getSecretKey));
+  api.intercept(authenticator(getSecretKeyCb));
+  // Register your routes as normal
+  api.get("/greeting", evnt => `Hello ${evnt.jwt.payload.name}!`);
+  // Export the proxyRouter normally in your code
+  // Here we call it instead to test it
+  api.proxyRouter(event, {done}, done);
+});
+
+const getSecretKeyP = (header) =>
+   new Promise((res, rej) => {
+     getSecretKeyCb(header, (err, secret) => {
+       if (err) {
+        rej(err);
+      } else {
+        res(secret);
+      }
+    });
+  });
+
+test.cb("Authenticate with secret key, via promise", t => {
+  t.plan(3);
+  const event = {
+    context: { method: "GET", path: "/greeting" },
+    headers: { Authorization: "bearer " + TOKEN_HS512 },
+  };
+  const done = async (error, response) => {
+    t.is(await error, null);
+    t.is(await response.body, '"Hello John Doe!"');
+    t.is(await response.statusCode, 200);
+    t.end();
+  };
+
+  // Begin by creating your Api Builder as normal
+  const api = new ApiBuilder();
+  // Next pass in the authenticator along with your key and any config
+  api.intercept(authenticator(getSecretKeyP));
   // Register your routes as normal
   api.get("/greeting", evnt => `Hello ${evnt.jwt.payload.name}!`);
   // Export the proxyRouter normally in your code
@@ -311,6 +347,37 @@ test.cb("Forgot to provide secret/key", t => {
 
   const api = new ApiBuilder();
   api.intercept(authenticator); // sic
+  api.get("/greeting", evnt => `Hello ${evnt.jwt.payload.name}!`);
+  api.proxyRouter(event, {done}, done);
+});
+
+const getSecretKeyPFail = () =>
+  new Promise((res, rej) => {
+    getSecretKeyCb({alg: "fail"}, (err, secret) => {
+      if (err) {
+        rej(err);
+      } else {
+        res(secret);
+      }
+    });
+  });
+
+test.cb("Failure fetching key", t => {
+  t.plan(3);
+  const event = {
+    context: { method: "GET", path: "/greeting" },
+    headers: { Authorization: "bearer " + TOKEN_HS512 },
+  };
+  const done = async (error, response) => {
+    t.is(await error, null);
+    // tslint:disable-next-line:max-line-length
+    t.is(await response.body, '"Unauthorised: JsonWebTokenError error in secret or public key callback: ENOENT: no such file or directory, open \'test/test.secret.fail.b64.txt\'"');
+    t.is(await response.statusCode, 401);
+    t.end();
+  };
+
+  const api = new ApiBuilder();
+  api.intercept(authenticator(getSecretKeyPFail));
   api.get("/greeting", evnt => `Hello ${evnt.jwt.payload.name}!`);
   api.proxyRouter(event, {done}, done);
 });
