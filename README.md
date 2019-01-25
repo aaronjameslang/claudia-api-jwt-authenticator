@@ -12,12 +12,14 @@ Easily verify and read [JWTs](https://jwt.io/) with [Claudia](https://github.com
 ## Installation [![npm version](https://badge.fury.io/js/claudia-api-jwt-authenticator.svg)](//npmjs.com/package/claudia-api-jwt-authenticator)
 
 ```shell
-  npm i claudia-api-jwt-authenticator
+npm i claudia-api-jwt-authenticator
 ```
 
 ## Usage
 
 ### Authenticate
+
+The `authenticator` takes a key (public or secret), a promised secret, or an async function (promise or callback).
 
 #### with a public key
 ```js
@@ -72,6 +74,8 @@ exports.handler = api.proxyRouter
 ```
 
 ### Authorise
+
+The `jwt` object has an `authorise` method (and an alias `authorize`) that takes a boolean, a promised boolean, or a function that returns a boolean or promised boolean.
 
 #### synchronously
 ```js
