@@ -17,7 +17,9 @@ Easily verify and read [JWTs](https://jwt.io/) with [Claudia](https://github.com
 
 ## Usage
 
-### with a public key
+### Authenticate
+
+#### with a public key
 ```js
 const ApiBuilder = require("claudia-api-builder");
 const authenticator = require("claudia-api-jwt-authenticator");
@@ -38,12 +40,12 @@ TQIDAQAB
 api.intercept(authenticator(PUBLIC_KEY));
 
 // Register your routes as normal
-api.get("/greeting", evnt => `Hello ${evnt.jwt.payload.name}!`);
+api.get("/greeting", event => `Hello ${event.jwt.payload.name}!`);
 
 exports.handler = api.proxyRouter
 ```
 
-### with a secret key
+#### with a secret key
 ```js
 const ApiBuilder = require("claudia-api-builder");
 const SecretsManager = require("aws-sdk/clients/secretsmanager");
@@ -64,9 +66,45 @@ const getSecret = (header, callback) =>
 api.intercept(authenticator(getSecret));
 
 // Register your routes as normal
-api.get("/greeting", evnt => `Hello ${evnt.jwt.payload.name}!`);
+api.get("/greeting", event => `Hello ${event.jwt.payload.name}!`);
 
 exports.handler = api.proxyRouter
+```
+
+### Authorise
+
+#### synchronously
+```js
+api.get("/greeting", ({ jwt }) => {
+  jwt.authorise(jwt.payload.roles.includes('superuser'))
+  return `Hello Superuser ${jwt.payload.name}`
+})
+```
+```js
+// allowRoles.js
+export default allowed => ({ jwt }) =>
+  jwt.payload.roles.some(r => ~allowed.indexOf(r))
+  
+// handleGetBilling.js
+import allowRoles from "allowRoles" 
+
+api.get("/billing", ({ jwt }) => {
+  jwt.authorise(allowRoles(['superuser', 'admin']))
+  return getBilling()
+})
+```
+
+#### asynchronously
+```js
+const canViewAccount = ({ jwt, pathParams }) =>
+  getDatabase().then(db =>
+    db.userCanViewAccount(jwt.payload.userId, pathParams.number)
+  )
+
+api.get("/account/{number}", ({ jwt, pathParams }) => {
+  jwt.authorise(canViewAccount)
+  return getAccountInfo(pathParams.number)
+})
 ```
 
 See the tests for more examples of what you can and shouldn't do
