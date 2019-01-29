@@ -371,7 +371,7 @@ test.cb('No token in authorization header', (t) => {
   })
 })
 
-const testApi = (t: any, api: any, event: any, expectedResponse: any, expectedError: any = null) => {
+export const testApi = (t: any, api: any, event: any, expectedResponse: any, expectedError: any = null) => {
   t.plan(1)
   const done = async (error: any, response: any) => {
         // await error

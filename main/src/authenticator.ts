@@ -4,6 +4,10 @@ import getToken from './getToken'
 import UnauthorisedResponse from './UnauthorisedResponse'
 import verify, { Jwt, SecretOrPublicKey, VerifyOptions } from './verify'
 
+export type Jwta = Jwt & {
+    authorise: (any) => never
+}
+
 export { SecretOrPublicKey, VerifyOptions }
 export type APIGatewayProxyEventJwt = APIGatewayProxyEvent & { jwt: Jwt }
 

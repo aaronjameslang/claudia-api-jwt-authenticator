@@ -75,30 +75,44 @@ exports.handler = api.proxyRouter
 
 ### Authorise
 
-The `jwt` object has an `authorise` method (and an alias `authorize`) that takes a boolean, a promised boolean, or a function that returns a boolean or promised boolean.
 
-#### synchronously
+#### with roles
+
+If you are using role based auth and want to check against an array of
+roles in the token you can use the below example.
+
+Use `withRoles` on the authenticator to specify a function which will
+extract the roles from the token. Customise this based on the structure
+of your token.
+
+Use `allowRoles` within your route handler to ensure that the user has
+the correct roles.
+
+```js
+const ApiBuilder = require("claudia-api-builder");
+const authenticator = require("claudia-api-jwt-authenticator");
+
+const api = new ApiBuilder();
+
+api.intercept(authenticator(PUBLIC_KEY).withRoles(jwt => jwt.payload.roles));
+
+api.get("/billing", ({ jwt }) => {
+  jwt.allowRoles('superuser', 'admin')
+  return `Hello ${event.jwt.payload.name}!`
+});
+```
+
+#### with custom authorisation
+
+The `jwt` object has an `authorise` method (and an alias `authorize`) that takes a boolean, a promised boolean, or a function that returns a boolean or promised boolean.
+You can use this to specify custom auth logic.
+
 ```js
 api.get("/greeting", ({ jwt }) => {
   jwt.authorise(jwt.payload.roles.includes('superuser'))
   return `Hello Superuser ${jwt.payload.name}`
 })
 ```
-```js
-// allowRoles.js
-export default allowed => ({ jwt }) =>
-  jwt.payload.roles.some(r => ~allowed.indexOf(r))
-  
-// handleGetBilling.js
-import allowRoles from "allowRoles" 
-
-api.get("/billing", ({ jwt }) => {
-  jwt.authorise(allowRoles(['superuser', 'admin']))
-  return getBilling()
-})
-```
-
-#### asynchronously
 ```js
 const canViewAccount = ({ jwt, pathParams }) =>
   getDatabase().then(db =>
@@ -110,6 +124,7 @@ api.get("/account/{number}", ({ jwt, pathParams }) => {
   return getAccountInfo(pathParams.number)
 })
 ```
+
 
 See the tests for more examples of what you can and shouldn't do
 
