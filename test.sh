@@ -15,6 +15,7 @@ else
 fi
 
 # ## Build
+rm -rf main/lib
 tsc -p main
 # ### Install locally, so tests run against pack'd code
 pkg_tgz="$(npm pack)"
@@ -22,6 +23,7 @@ rm -rf package
 tar -zxf ${pkg_tgz}
 rm ${pkg_tgz}
 # ### Build tests against package
+rm -rf test/lib
 tsc -p test
 
 

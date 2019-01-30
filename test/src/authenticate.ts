@@ -1,17 +1,16 @@
 import test from 'ava'
 import ApiBuilder from 'claudia-api-builder'
 import * as fs from 'fs'
-import authenticator, {
+import {
     APIGatewayProxyEventJwt,
-    authenticator as authenticator2,
+    authenticate,
     JwtHeader,
     Secret,
     SigningKeyCallback
 } from '../../package/'
 
-test('authenticator is exported', (t) => {
-  t.is(typeof authenticator, 'function')
-  t.is(authenticator, authenticator2)
+test('authenticate is a function', (t) => {
+  t.is(typeof authenticate, 'function')
 })
 
 /**
@@ -38,8 +37,8 @@ TQIDAQAB
 test.cb('Authenticate with public key', (t) => {
   // Begin by creating your Api Builder as normal
   const api = new ApiBuilder()
-  // Next pass in the authenticator along with your key and any config
-  api.intercept(authenticator(PUBLIC_KEY))
+  // Next pass in the authenticate along with your key and any config
+  api.intercept(authenticate(PUBLIC_KEY))
   // Register your routes as normal
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
     // Export the proxyRouter normally in your code
@@ -96,8 +95,8 @@ const getSecretKeyP = (header: JwtHeader) =>
 test.cb('Authenticate with secret key, via promise', (t) => {
     // Begin by creating your Api Builder as normal
   const api = new ApiBuilder()
-    // Next pass in the authenticator along with your key and any config
-  api.intercept(authenticator(getSecretKeyP))
+    // Next pass in the authenticate along with your key and any config
+  api.intercept(authenticate(getSecretKeyP))
     // Register your routes as normal
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
     // Export the proxyRouter normally in your code
@@ -116,8 +115,8 @@ test.cb('Authenticate with secret key, via promise', (t) => {
 test.cb('Authenticate with secret key, via callback', (t) => {
     // Begin by creating your Api Builder as normal
   const api = new ApiBuilder()
-    // Next pass in the authenticator along with your key and any config
-  api.intercept(authenticator(getSecretKeyCb))
+    // Next pass in the authenticate along with your key and any config
+  api.intercept(authenticate(getSecretKeyCb))
     // Register your routes as normal
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
     // Export the proxyRouter normally in your code
@@ -141,7 +140,7 @@ test.cb('Authenticate with secret key, via callback', (t) => {
 
 test.cb('Headers & Signature access', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY))
+  api.intercept(authenticate(PUBLIC_KEY))
   api.get('/token', (event: APIGatewayProxyEventJwt) => ({
     algorithm: event.jwt.header.alg,
     signature: event.jwt.signature.substr(0, 12),
@@ -171,7 +170,7 @@ test.cb('Headers & Signature access', (t) => {
 
 test.cb('Specify algorithm - success', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY, { algorithms: ['RS512'] }))
+  api.intercept(authenticate(PUBLIC_KEY, { algorithms: ['RS512'] }))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
@@ -184,13 +183,13 @@ test.cb('Specify algorithm - success', (t) => {
 
 test.cb('Specify algorithm - failure', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY, { algorithms: ['RS256'] }))
+  api.intercept(authenticate(PUBLIC_KEY, { algorithms: ['RS256'] }))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
     headers: { Authorization: 'bearer ' + TOKEN_RS512 }
   }, {
-    body: '"Unauthorised: JsonWebTokenError invalid algorithm"',
+    body: '"401 Unauthorised: JsonWebTokenError invalid algorithm"',
     statusCode: 401
   })
 })
@@ -200,7 +199,7 @@ test.cb('Specify audience - success', (t) => {
   const TOKEN_RS512_AUD = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJhdWQiOiJGNDJFRDA4Mi03OTlGLTQ3NkItQjc3RS0xMjAxM0Y1Mzc5QTUifQ.VAnH9ozEAcL3foiSgqJspqS05AdYchn57uKrbCUEwX9uXbsg8nct9bL7y8Omw6qg5ZdTcNsnor8tysGW460yOmg06Pbx0SRHJifJGLpy1bOCWRPG_5NB5aM6uKf78T2QCJXm9f73nKfZ9QJUlfzW41bT2khnsO8gTVYo9yd3yesrKegMlSomxd4VrZFYz4jbNh2f9FUe8MNkubfOxVbM5U7sh5aZMs_uoef08Gxp3Aqx7fPpzj16uW2JTNlhoIYUF4J33T0SufgiR1Xw3R3Jn2BnwdlfgqjLrv0lxzDzHoPyPP8i6TSl3notTcTmLc_GItdcnLNPn8wtjxKNW81tMQ'
 
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY, { audience: 'F42ED082-799F-476B-B77E-12013F5379A5' }))
+  api.intercept(authenticate(PUBLIC_KEY, { audience: 'F42ED082-799F-476B-B77E-12013F5379A5' }))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
@@ -213,13 +212,13 @@ test.cb('Specify audience - success', (t) => {
 
 test.cb('Specify audience - failure', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY, { audience: 'F42ED082-799F-476B-B77E-12013F5379A5' }))
+  api.intercept(authenticate(PUBLIC_KEY, { audience: 'F42ED082-799F-476B-B77E-12013F5379A5' }))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
     headers: { Authorization: 'bearer ' + TOKEN_RS512 }
   }, {
-    body: '"Unauthorised: JsonWebTokenError jwt audience invalid. expected: F42ED082-799F-476B-B77E-12013F5379A5"',
+    body: '"401 Unauthorised: JsonWebTokenError jwt audience invalid. expected: F42ED082-799F-476B-B77E-12013F5379A5"',
     statusCode: 401
   })
 })
@@ -233,7 +232,7 @@ test.cb('XWT', (t) => {
   const TOKEN_RS512_XWT = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IlhXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.liqYAp9dbby9IzokHKbLkQb5mUAHoO0Ef7hn4Wz-Oh6kVcdqGQjtUFZPbONe9NPLLCuX_82_TkWXdKja5ISHLw3m028d2NGEQ2cbBxOCjHSqeuztUavwzQPeJUNUREh07IQK_MTw-BCskKLoJToIx2NZ3AfttCu4QWXBaJTZkIds0sQIQR11Z3w48QQS7Bjbtmrhzufpw_yfk8Fh0a0PjAlYmTgkE7JAUBT0NwqVPuqrTNUKxHe5DrqeuSAr0VeHSM05HvJFqrncF0KuBfTj0HUzwi6JpZxzlwxx_gzfaHEw2lFtRLJIonVLMAKM1aFj5m67FyfxqUQx0JnqRkEWrQ'
 
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY))
+  api.intercept(authenticate(PUBLIC_KEY))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
@@ -255,13 +254,13 @@ test.cb('Expired', (t) => {
   const TOKEN_RS512_EXP = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoxNTE2MjM5MDIyfQ.ed_PPzBaYmalmwTp1OxF9--QlPATgTWYVuc2Qg-tofDe4Mhn98B0aEZ-3wN9h2loQG05xhhUy_ZOyLYPYhZrKavU7UiVEIRmDUj2VYzmX575_GdGmxsaoluNP3xYqGjxs4U1-uQN1YIEQRvGx2pn-QeK9crawvzLVdZgyBr69-xVUbsDNIR5msx2Qg2uZLrPWe4ZGoYlpecUDfSoktHAkxsTfcjtE2niS_-Y8yoRqGemu8MWNwMca7edg2xJn-J0z5DDMYgzdVyI9oHkf-vu_lb535ekuYAigXBKLRBbPO9zzXv3LmJFlDJKJzkKGU8CSkUTR11ftsEc7BbUvsQ6Zg'
 
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY))
+  api.intercept(authenticate(PUBLIC_KEY))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
     headers: { Authorization: 'bearer ' + TOKEN_RS512_EXP }
   }, {
-    body: '"Unauthorised: TokenExpiredError jwt expired"',
+    body: '"401 Unauthorised: TokenExpiredError jwt expired"',
     statusCode: 401
   })
 })
@@ -271,20 +270,20 @@ test.cb('Invalid/Forged token signature', (t) => {
   const TOKEN_RS512_INV = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoxNTE2MjM5MDIyfQ.ed_PPzBaYmalmwTp1OxF9--QlPATgTWYVuc2Qg-tofDe4Mhn98B0aEZ-3wN9h2loQG05xhhUy_ZOyLYPYhZrKavU7UiVEIRmDUj2VYzmX575_GdGmxsaoluNP3xYqGjxs4U1-uQN1YIEQRvGx2pn-QeK9crawvzLVdZgyBr69-xVUbsDNIR5msx2Qg2uZLrPWe4ZGoYlpecUDfSoktHAkxsTfcjtE2niS_-Y8yoRqGemu8MWNwMca7edg2xJn-J0z5DDMYgzdVyI9oHkf-vu_lb535ekuYAigXBKLRBbPO9zzXv3LmJFlDJKJzkKGU7CSkUTR11ftsEc7BbUvsQ6Zg'
 
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY))
+  api.intercept(authenticate(PUBLIC_KEY))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
     headers: { Authorization: 'bearer ' + TOKEN_RS512_INV }
   }, {
-    body: '"Unauthorised: JsonWebTokenError invalid signature"',
+    body: '"401 Unauthorised: JsonWebTokenError invalid signature"',
     statusCode: 401
   })
 })
 
 test.cb('Forgot to provide secret/key', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator) // sic
+  api.intercept(authenticate) // sic
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
@@ -308,65 +307,65 @@ const getSecretKeyPFail = () =>
 
 test.cb('Failure fetching key', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator(getSecretKeyPFail))
+  api.intercept(authenticate(getSecretKeyPFail))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
     headers: { Authorization: 'bearer ' + TOKEN_HS512 }
   }, {
     // tslint:disable-next-line:max-line-length
-    body: '"Unauthorised: JsonWebTokenError error in secret or public key callback: ENOENT: no such file or directory, open \'test/test.secret.fail.b64.txt\'"',
+    body: '"401 Unauthorised: JsonWebTokenError error in secret or public key callback: ENOENT: no such file or directory, open \'test/test.secret.fail.b64.txt\'"',
     statusCode: 401
   })
 })
 
 test.cb('No headers in event', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY))
+  api.intercept(authenticate(PUBLIC_KEY))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' }
   }, {
-    body: '"Unauthorised: no headers"',
+    body: '"401 Unauthorised: no headers"',
     statusCode: 401
   })
 })
 
 test.cb('No authorization in headers', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY))
+  api.intercept(authenticate(PUBLIC_KEY))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
     headers: {}
   }, {
-    body: '"Unauthorised: no authorization header"',
+    body: '"401 Unauthorised: no authorization header"',
     statusCode: 401
   })
 })
 
 test.cb('No bearer in authorization header', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY))
+  api.intercept(authenticate(PUBLIC_KEY))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
     headers: { Authorization: 'Basic QWxhZGRpbjpPcGVuU2VzYW1l' }
   }, {
-    body: '"Unauthorised: authorization scheme must be bearer"',
+    body: '"401 Unauthorised: authorization scheme must be bearer"',
     statusCode: 401
   })
 })
 
 test.cb('No token in authorization header', (t) => {
   const api = new ApiBuilder()
-  api.intercept(authenticator(PUBLIC_KEY))
+  api.intercept(authenticate(PUBLIC_KEY))
   api.get('/greeting', (event: APIGatewayProxyEventJwt) => `Hello ${event.jwt.payload.name}!`)
   testApi(t, api, {
     context: { method: 'GET', path: '/greeting' },
     headers: { Authorization: 'bearer ' }
   }, {
-    body: '"Unauthorised: no authorization token"',
+    body: '"401 Unauthorised: no authorization token"',
     statusCode: 401
   })
 })

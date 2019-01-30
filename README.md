@@ -17,14 +17,14 @@ npm i claudia-api-jwt-authenticator
 
 ## Usage
 
-### Authenticate
+### authenticate
 
-The `authenticator` takes a key (public or secret), a promised secret, or an async function (promise or callback).
+The `authenticate` function takes a key (public or secret), a promised key, or an async function (promise or callback).
 
 #### with a public key
 ```js
 const ApiBuilder = require("claudia-api-builder");
-const authenticator = require("claudia-api-jwt-authenticator");
+const { authenticate } = require("claudia-api-jwt-authenticator");
 
 // Begin by creating your Api Builder as normal
 const api = new ApiBuilder();
@@ -39,7 +39,7 @@ I655+ltaf3Gb3CBJSz888i3DfaKT30cCC/7r3rnOqbKjUcG8qxrsp+yOo8l6BeeJ
 g57ITeuaRrSza7zdvS0Vydp9RS7VS9JdHQv9b48b7rsx+WLghI/AQ3kK0Xg85C9R
 TQIDAQAB
 -----END PUBLIC KEY-----`;
-api.intercept(authenticator(PUBLIC_KEY));
+api.intercept(authenticate(PUBLIC_KEY));
 
 // Register your routes as normal
 api.get("/greeting", event => `Hello ${event.jwt.payload.name}!`);
@@ -51,7 +51,7 @@ exports.handler = api.proxyRouter
 ```js
 const ApiBuilder = require("claudia-api-builder");
 const SecretsManager = require("aws-sdk/clients/secretsmanager");
-const authenticator = require("claudia-api-jwt-authenticator");
+const { authenticate } = require("claudia-api-jwt-authenticator");
 
 // Begin by creating your Api Builder as normal
 const api = new ApiBuilder();
@@ -65,7 +65,7 @@ const getSecret = (header, callback) =>
     .then(({SecretString}) => JSON.parse(SecretString))
     .then(({secretKey}) => Buffer.from(secretKey, 'base64'))
  
-api.intercept(authenticator(getSecret));
+api.intercept(authenticate(getSecret));
 
 // Register your routes as normal
 api.get("/greeting", event => `Hello ${event.jwt.payload.name}!`);
@@ -73,7 +73,7 @@ api.get("/greeting", event => `Hello ${event.jwt.payload.name}!`);
 exports.handler = api.proxyRouter
 ```
 
-### Authorise
+### authorise
 
 
 #### with roles
@@ -81,46 +81,49 @@ exports.handler = api.proxyRouter
 If you are using role based auth and want to check against an array of
 roles in the token you can use the below example.
 
-Use `withRoles` on the authenticator to specify a function which will
+Use `withRoles` before authenticating to specify a function which will
 extract the roles from the token. Customise this based on the structure
 of your token.
 
-Use `allowRoles` within your route handler to ensure that the user has
+Use `authoriseRoles` within your route handler to ensure that the user has
 the correct roles.
 
 ```js
 const ApiBuilder = require("claudia-api-builder");
-const authenticator = require("claudia-api-jwt-authenticator");
+const { withRoles, authoriseRoles } = require("claudia-api-jwt-authenticator");
 
 const api = new ApiBuilder();
 
-api.intercept(authenticator(PUBLIC_KEY).withRoles(jwt => jwt.payload.roles));
+api.intercept(withRoles(jwt => jwt.payload.roles).authenticate(PUBLIC_KEY));
 
 api.get("/billing", ({ jwt }) => {
-  jwt.allowRoles('superuser', 'admin')
-  return `Hello ${event.jwt.payload.name}!`
+  authoriseRoles(jwt, 'superuser', 'admin')
+  return `Hello ${jwt.payload.name}!`
 });
 ```
 
 #### with custom authorisation
 
-The `jwt` object has an `authorise` method (and an alias `authorize`) that takes a boolean, a promised boolean, or a function that returns a boolean or promised boolean.
-You can use this to specify custom auth logic.
+The `authorise` method (and an alias `authorize`) takes a boolean, a promised boolean, or a function that returns a boolean or promised boolean. You can use this to specify custom auth logic.
 
 ```js
+const { authorise } = require("claudia-api-jwt-authenticator");
+
 api.get("/greeting", ({ jwt }) => {
-  jwt.authorise(jwt.payload.roles.includes('superuser'))
+  authorise(jwt.payload.roles.includes('superuser'))
   return `Hello Superuser ${jwt.payload.name}`
 })
 ```
 ```js
+const { authorise } = require("claudia-api-jwt-authenticator");
+
 const canViewAccount = ({ jwt, pathParams }) =>
   getDatabase().then(db =>
     db.userCanViewAccount(jwt.payload.userId, pathParams.number)
   )
 
 api.get("/account/{number}", ({ jwt, pathParams }) => {
-  jwt.authorise(canViewAccount)
+  authorise(canViewAccount)
   return getAccountInfo(pathParams.number)
 })
 ```
