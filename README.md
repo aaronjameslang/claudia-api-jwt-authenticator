@@ -122,9 +122,9 @@ const canViewAccount = ({ jwt, pathParams }) =>
     db.userCanViewAccount(jwt.payload.userId, pathParams.number)
   )
 
-api.get("/account/{number}", ({ jwt, pathParams }) => {
-  authorise(canViewAccount)
-  return getAccountInfo(pathParams.number)
+api.get("/account/{number}", (event) => {
+  authorise(canViewAccount(event))
+  return getAccountInfo(event.pathParams.number)
 })
 ```
 

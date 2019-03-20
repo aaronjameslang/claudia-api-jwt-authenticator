@@ -372,7 +372,7 @@ test.cb('No token in authorization header', (t) => {
 
 export const testApi = (t: any, api: any, event: any, expectedResponse: any, expectedError: any = null) => {
   t.plan(1)
-  const done = async (error: any, response: any) => {
+  const done = (error: any, response: any) => {
         // await error
         // await response
     if (response) delete response.headers
@@ -382,5 +382,10 @@ export const testApi = (t: any, api: any, event: any, expectedResponse: any, exp
         )
     t.end()
   }
-  api.proxyRouter(event, { done }, done)
+  try {
+    const result = api.proxyRouter(event, { done }, done)
+    // if (result) done(null, result)
+  } catch (e) {
+    done(e, null)
+  }
 }

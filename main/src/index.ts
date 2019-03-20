@@ -1,4 +1,5 @@
 export * from './authenticate'
+export * from './authorise'
 export {
     JwtHeader,
     Secret,
