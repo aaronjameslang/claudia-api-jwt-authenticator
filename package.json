@@ -31,7 +31,7 @@
     "@types/aws-lambda": "^8.10.17"
   },
   "devDependencies": {
-    "ava": "^1.1.0",
+    "ava": "^2.0.0",
     "claudia-api-builder": "^4.1.0",
     "nyc": "^13.1.0",
     "stryker": "^0.34.0",
