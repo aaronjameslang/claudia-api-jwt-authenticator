@@ -5,7 +5,6 @@
 [![Mutation testing badge](https://badge.stryker-mutator.io/github.com/aaronjameslang/claudia-api-jwt-authenticator/master)](https://stryker-mutator.github.io)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/aaronjameslang/claudia-api-jwt-authenticator/badges/quality-score.png)](//scrutinizer-ci.com/g/aaronjameslang/claudia-api-jwt-authenticator)
 [![Known Vulnerabilities](http://snyk.io/test/github/aaronjameslang/claudia-api-jwt-authenticator/badge.svg)](//snyk.io/test/github/aaronjameslang/claudia-api-jwt-authenticator)
-[![Greenkeeper badge](https://badges.greenkeeper.io/aaronjameslang/claudia-api-jwt-authenticator.svg)](https://greenkeeper.io/)
 
 Easily verify and read [JWTs](https://jwt.io/) with [Claudia](https://github.com/claudiajs/claudia-api-builder)
 
