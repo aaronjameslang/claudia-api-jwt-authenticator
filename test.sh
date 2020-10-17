@@ -28,10 +28,10 @@ tsc -p test
 # ## Test
 nyc ava
 
-if ! test "${1:-}" = '--quick'
-then
-  : || stryker run
-fi
+#if ! test "${1:-}" = '--quick'
+#then
+  #: || stryker run
+#fi
 
 tslint -p main
 tslint -p test
